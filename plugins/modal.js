@@ -1,6 +1,3 @@
-Element.prototype.appendAfter = function(element) {
-  element.parentNode.insertBefore(this, element.nextSibling)
-}
 
 function noop() {}
 
@@ -97,6 +94,11 @@ $.modal = function(options) {
     },
     setContent(html) {
       $modal.querySelector('[data-content]').innerHTML = html
+    },
+    setFooterButtons(buttons) {
+        const newFooter = _createModalFooter(buttons);
+        $modal.querySelector('.modal-footer').remove();
+        newFooter.appendAfter($modal.querySelector('[data-content]'));
     }
   })
 }
