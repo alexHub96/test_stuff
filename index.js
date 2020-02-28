@@ -62,7 +62,6 @@ document.addEventListener('confirmDelete', (e) => {
             {
                 text: 'Ок', type: 'primary', handler() {
                     modal.close();
-
                     cards.confirmDelete(e)
                 }
             },

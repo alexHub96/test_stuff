@@ -18,32 +18,15 @@ function _createCard(card) {
 }
 
 function addOrRemoveListenerTo($parentNode, addOrRemoveEventListener, selector, eventName, func, funcParams = null) {
-    if (addOrRemoveEventListener === 'add') {
-        $parentNode.querySelectorAll(selector).forEach(item => {
-            item.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                func(e, funcParams)
-            })
-        })
-    }
-    else if (addOrRemoveEventListener === 'remove') {
-        $parentNode.querySelectorAll(selector).forEach(item => {
-            console.log(item, eventName, func)
-            item.removeEventListener(eventName, func)
-        })
-    }
+    $parentNode.querySelectorAll(selector).forEach(item => item[addOrRemoveEventListener](eventName, func, funcParams))
 }
 
 function addSetOfListeners($parentNode, items) {
-    items.forEach(item => {
-        addOrRemoveListenerTo($parentNode, 'add', item.selector, item.eventName, item.func, item.funcParams)
-    })
+    items.forEach(item => addOrRemoveListenerTo($parentNode, 'addEventListener', item.selector, item.eventName, item.func, item.funcParams))
 }
 
 function removeSetOfListeners($parentNode, items) {
-    items.forEach(item => {
-        addOrRemoveListenerTo($parentNode, 'remove', item.selector, item.eventName, item.func, item.funcParams)
-    })
+    items.forEach(item => addOrRemoveListenerTo($parentNode, 'removeEventListener', item.selector, item.eventName, item.func, item.funcParams))
 }
 
 
@@ -57,26 +40,28 @@ $.card = function (cardsArray) {
     const confirmDeleteEvent = new Event("confirmDelete", {bubbles: true});
     const showPriceEvent = new Event("showPrice", {bubbles: true});
     const cardsActions = {
-        openCardPopup(e) {
-            e.target.dispatchEvent(showPriceEvent);
-        },
-        addCard(card) {
+        addCard: function (card) {
             const newCard = _createCard(card);
             $cards.appendChild(newCard);
             addSetOfListeners(newCard, listenerItems);
         },
-        deleteCard(e) {
+        openCardPopup: function (e) {
+            e.preventDefault()
+            e.target.dispatchEvent(showPriceEvent);
+        },
+        deleteCard: function (e) {
+            e.preventDefault()
             e.target.dispatchEvent(confirmDeleteEvent);
         },
-        confirmDelete(e) {
+        confirmDelete: function (e) {
+            e.preventDefault()
             const parent = e.target.closest('.col');
             removeSetOfListeners(parent, listenerItems);
-            // parent.remove();
+            parent.remove();
         },
-        disposeCards() {
+        disposeCards: function () {
             removeSetOfListeners($cards, listenerItems);
             $cards.remove();
-
         }
     };
     const listenerItems = [
@@ -90,5 +75,5 @@ $.card = function (cardsArray) {
     ];
 
     addSetOfListeners($cards, listenerItems);
-    return Object.assign(cardsActions, {listenerItems: listenerItems});
+    return Object.assign(cardsActions);
 };
