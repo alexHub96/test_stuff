@@ -32,15 +32,8 @@ function addSetOfListeners($parentNode, items) {
     })
 }
 
-function noop() {
-}
 
-$.card = function (cardsArray, modal) {
-
-    if (typeof modal !== 'object') {
-        modal = noop();
-    }
-
+$.card = function (cardsArray) {
     const $cards = document.createElement('div');
     $cards.classList.add('row');
     cardsArray.forEach(card => {
@@ -49,34 +42,16 @@ $.card = function (cardsArray, modal) {
     document.body.appendChild($cards);
 
     const cardsActions = {
-        openCardPopup(e, params) {
-            console.log(params)
-            modal.setContent(`<h3>Цена: ${e.target.dataset.price}</h3>`);
-            modal.open();
+        openCardPopup(e) {
+            e.target.dispatchEvent(new Event("showPrice", {bubbles: true}));
         },
         addCard(card) {
             const newCard = _createCard(card);
             $cards.appendChild(newCard);
             addSetOfListeners(newCard, listenerItems);
         },
-        deleteCard(event) {
-            modal.setContent('Вы увернны?');
-            modal.setFooterButtons(
-                [
-                    {
-                        text: 'Ок', type: 'primary', handler() {
-                            modal.close();
-                            event.target.closest('.col').remove();
-                        }
-                    },
-                    {
-                        text: 'Cancel', type: 'danger', handler() {
-                            modal.close()
-                        }
-                    }
-                ]
-            )
-            modal.open();
+        deleteCard(e) {
+            e.target.dispatchEvent(new Event("confirmDelete", {bubbles: true}));
         },
         disposeCards() {
             $cards.remove();
@@ -93,6 +68,5 @@ $.card = function (cardsArray, modal) {
     ];
 
     addSetOfListeners($cards, listenerItems);
-
     return cardsActions;
 };
