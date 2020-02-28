@@ -52,7 +52,7 @@ const modal = $.modal({
     ]
 })
 
-const cards = $.card(fruits, modal);
+const cards = $.card(fruits);
 
 
 document.addEventListener('confirmDelete', (e) => {
