@@ -54,8 +54,7 @@ const modal = $.modal({
 
 const cards = $.card(fruits);
 
-
-document.addEventListener('confirmDelete', (e) => {
+function confirmDelete(e) {
     modal.setContent('Вы увернны?');
     modal.setFooterButtons(
         [
@@ -73,9 +72,31 @@ document.addEventListener('confirmDelete', (e) => {
         ]
     )
     modal.open();
-});
+}
 
-document.addEventListener('showPrice', (e) => {
+function showPrice(e) {
     modal.setContent(`<h3>Цена: ${e.target.dataset.price}</h3>`);
     modal.open();
-})
+}
+
+document.addEventListener('confirmDelete', confirmDelete, true);
+
+document.addEventListener('showPrice', showPrice, true);
+
+document.querySelector('figure').addEventListener('click', function () {
+    const img = this.querySelector('img');
+    const src = img.src;
+    img.src = img.dataset.alt;
+    cards.disposeCards();
+    modal.destroy();
+
+    document.removeEventListener('confirmDelete', confirmDelete, true);
+    document.removeEventListener('showPrice', showPrice, true);
+
+
+    setTimeout(() => {
+        img.src = src;
+        document.body.innerText = ''
+    }, 5000)
+
+}, {once: true});
