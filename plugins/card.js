@@ -40,10 +40,11 @@ $.card = function (cardsArray) {
         $cards.appendChild(_createCard(card));
     });
     document.body.appendChild($cards);
-
+    const confirmDeleteEvent = new Event("confirmDelete", {bubbles: true});
+    const showPriceEvent = new Event("showPrice", {bubbles: true});
     const cardsActions = {
         openCardPopup(e) {
-            e.target.dispatchEvent(new Event("showPrice", {bubbles: true}));
+            e.target.dispatchEvent(showPriceEvent);
         },
         addCard(card) {
             const newCard = _createCard(card);
@@ -51,7 +52,7 @@ $.card = function (cardsArray) {
             addSetOfListeners(newCard, listenerItems);
         },
         deleteCard(e) {
-            e.target.dispatchEvent(new Event("confirmDelete", {bubbles: true}));
+            e.target.dispatchEvent(confirmDeleteEvent);
         },
         disposeCards() {
             $cards.remove();
