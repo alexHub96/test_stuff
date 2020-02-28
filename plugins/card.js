@@ -17,18 +17,32 @@ function _createCard(card) {
     return $card
 }
 
-function addListenerTo($parentNode, selector, eventName, func, funcParams = null) {
-    $parentNode.querySelectorAll(selector).forEach(item => {
-        item.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            func(e, funcParams)
+function addOrRemoveListenerTo($parentNode, addOrRemoveEventListener, selector, eventName, func, funcParams = null) {
+    if (addOrRemoveEventListener === 'add') {
+        $parentNode.querySelectorAll(selector).forEach(item => {
+            item.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                func(e, funcParams)
+            })
         })
-    })
+    }
+    else if (addOrRemoveEventListener === 'remove') {
+        $parentNode.querySelectorAll(selector).forEach(item => {
+            console.log(item, eventName, func)
+            item.removeEventListener(eventName, func)
+        })
+    }
 }
 
 function addSetOfListeners($parentNode, items) {
     items.forEach(item => {
-        addListenerTo($parentNode, item.selector, item.eventName, item.func, item.funcParams)
+        addOrRemoveListenerTo($parentNode, 'add', item.selector, item.eventName, item.func, item.funcParams)
+    })
+}
+
+function removeSetOfListeners($parentNode, items) {
+    items.forEach(item => {
+        addOrRemoveListenerTo($parentNode, 'remove', item.selector, item.eventName, item.func, item.funcParams)
     })
 }
 
@@ -54,8 +68,15 @@ $.card = function (cardsArray) {
         deleteCard(e) {
             e.target.dispatchEvent(confirmDeleteEvent);
         },
+        confirmDelete(e) {
+            const parent = e.target.closest('.col');
+            removeSetOfListeners(parent, listenerItems);
+            // parent.remove();
+        },
         disposeCards() {
+            removeSetOfListeners($cards, listenerItems);
             $cards.remove();
+
         }
     };
     const listenerItems = [
@@ -69,5 +90,5 @@ $.card = function (cardsArray) {
     ];
 
     addSetOfListeners($cards, listenerItems);
-    return cardsActions;
+    return Object.assign(cardsActions, {listenerItems: listenerItems});
 };
